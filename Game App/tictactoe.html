@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic-Tac-Toe</title>
+  <!-- Include Font Awesome for the arrow icon -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(to bottom, #444, #000);
+      font-family: 'Arial', sans-serif;
+      color: white;
+      overflow: hidden;
+    }
+
+    .top-bar {
+      background-color: rgba(0, 0, 0, 0.8);
+      color: #f1f1f1;
+      width: 100%;
+      padding: 15px 10px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .top-bar a {
+      color: #f1f1f1;
+      font-size: 20px;
+      text-decoration: none;
+    }
+
+    .top-bar a:hover {
+      color: #ffaa00;
+    }
+
+    .top-bar .back-arrow {
+      font-size: 30px;
+    }
+
+    .game-container {
+      display: grid;
+      gap: 2px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 3px solid rgba(255, 255, 255, 0.5);
+      border-radius: 10px;
+      margin-top: 20px;
+      width: calc(100vmin - 40px);
+      height: calc(100vmin - 40px);
+      max-width: 400px;
+      max-height: 400px;
+      position: relative;
+      padding: 5px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6);
+    }
+
+    .cell {
+      background-color: rgba(255, 255, 255, 0.2);
+      color: white;
+      font-size: calc(1vmin + 1em);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      user-select: none;
+      border-radius: 4px;
+      box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
+      transition: transform 0.2s, background-color 0.3s, box-shadow 0.3s;
+    }
+
+    .cell.hidden {
+      background-color: rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+      transform: scale(1);
+    }
+
+    .cell.hidden:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 6px #fff;
+    }
+
+    .cell.x {
+      background-color: #ff0000;
+      font-size: 3em;
+      font-weight: bold;
+    }
+
+    .cell.o {
+      background-color: #00ff00;
+      font-size: 3em;
+      font-weight: bold;
+    }
+
+    .game-over-screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+    }
+
+    .game-over-screen h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      color: #ffaa00;
+    }
+
+    .game-over-screen p {
+      font-size: 1.5em;
+      margin-bottom: 20px;
+    }
+
+    .game-over-screen button {
+      padding: 15px 30px;
+      font-size: 18px;
+      color: white;
+      background-color: #00aaff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+
+    .game-over-screen button:hover {
+      background-color: #007acc;
+      transform: scale(1.1);
+    }
+
+    .score-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: calc(100vmin - 40px);
+      max-width: 400px;
+      margin-top: 20px;
+      padding: 10px;
+      background-color: rgba(0, 0, 0, 0.8);
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 10px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6);
+    }
+
+    .back-arrow {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 24px;
+      color: #fff;
+      text-decoration: none;
+      z-index: 10;
+    }
+
+    .back-arrow:hover {
+      color: #ffee32;
+    }
+
+    @media (max-width: 768px) {
+      .back-arrow {
+        font-size: 20px;
+        left: 15px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .back-arrow {
+        font-size: 18px;
+        left: 10px;
+      }
+    }
+
+    /* Restart Button Styling */
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #ffaa00;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+
+    button:hover {
+      background-color: #ff8800;
+      transform: scale(1.1);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="top-bar">
+    <a href="index.html" class="back-arrow"><i class="fas fa-arrow-left"></i></a>
+    Tic-Tac-Toe
+  </div>
+  <div id="game" class="game-container"></div>
+  <div class="score-container">
+    <span>Player 1 (X): <span id="player1-score">0</span></span>
+    <span>Player 2 (O): <span id="player2-score">0</span></span>
+    <button onclick="initializeGame()">Restart Game</button>
+  </div>
+
+  <script>
+    const gridSize = 3; // 3x3 grid for Tic-Tac-Toe
+    let grid = [];
+    let currentPlayer = 'x';
+    let player1Score = 0;
+    let player2Score = 0;
+    let gameContainer = document.getElementById('game');
+    let player1ScoreDisplay = document.getElementById('player1-score');
+    let player2ScoreDisplay = document.getElementById('player2-score');
+
+    function initializeGame() {
+      gameContainer.innerHTML = '';
+      hideGameOverScreen();
+      grid = Array.from({ length: gridSize }, () => Array(gridSize).fill(null));
+      renderGrid();
+    }
+
+    function renderGrid() {
+      gameContainer.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+      gameContainer.style.gridTemplateRows = `repeat(${gridSize}, 1fr)`;
+
+      for (let x = 0; x < gridSize; x++) {
+        for (let y = 0; y < gridSize; y++) {
+          const cell = document.createElement('div');
+          cell.classList.add('cell', 'hidden');
+          cell.dataset.x = x;
+          cell.dataset.y = y;
+
+          cell.addEventListener('click', () => handleClick(x, y));
+
+          gameContainer.appendChild(cell);
+        }
+      }
+    }
+
+    function handleClick(x, y) {
+      const cell = document.querySelector(`.cell[data-x="${x}"][data-y="${y}"]`);
+      if (cell.classList.contains('x') || cell.classList.contains('o')) return;
+
+      grid[x][y] = currentPlayer;
+      cell.classList.add(currentPlayer);
+      cell.classList.remove('hidden');
+      cell.textContent = currentPlayer === 'x' ? 'X' : 'O';
+
+      if (checkWin()) {
+        updateScore();
+        gameOver(true);
+      } else if (grid.flat().every(cell => cell !== null)) {
+        gameOver(false);
+      } else {
+        currentPlayer = currentPlayer === 'x' ? 'o' : 'x';
+      }
+    }
+
+    function checkWin() {
+      const winPatterns = [
+        [[0, 0], [0, 1], [0, 2]],
+        [[1, 0], [1, 1], [1, 2]],
+        [[2, 0], [2, 1], [2, 2]],
+        [[0, 0], [1, 0], [2, 0]],
+        [[0, 1], [1, 1], [2, 1]],
+        [[0, 2], [1, 2], [2, 2]],
+        [[0, 0], [1, 1], [2, 2]],
+        [[0, 2], [1, 1], [2, 0]],
+      ];
+
+      return winPatterns.some(pattern => {
+        return pattern.every(([x, y]) => grid[x][y] === currentPlayer);
+      });
+    }
+
+    function gameOver(won) {
+      const gameOverScreen = document.createElement('div');
+      gameOverScreen.classList.add('game-over-screen');
+      gameOverScreen.innerHTML = `
+        <h1>${won ? `Player ${currentPlayer.toUpperCase()} Wins!` : 'It\'s a Draw!'}</h1>
+        <p>Click Restart to Play Again</p>
+      `;
+      gameContainer.appendChild(gameOverScreen);
+    }
+
+    function hideGameOverScreen() {
+      const gameOverScreen = document.querySelector('.game-over-screen');
+      if (gameOverScreen) {
+        gameOverScreen.remove();
+      }
+    }
+
+    function updateScore() {
+      if (currentPlayer === 'x') {
+        player1Score++;
+        player1ScoreDisplay.textContent = player1Score;
+      } else {
+        player2Score++;
+        player2ScoreDisplay.textContent = player2Score;
+      }
+    }
+
+    window.onload = initializeGame;
+  </script>
+</body>
+
+</html>

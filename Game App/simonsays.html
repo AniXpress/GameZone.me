@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simon Says</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(to bottom, #444, #000);
+      font-family: 'Arial', sans-serif;
+      color: white;
+      overflow: hidden;
+    }
+
+    .top-bar {
+      background-color: rgba(0, 0, 0, 0.8);
+      color: #f1f1f1;
+      width: 100%;
+      padding: 15px 10px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    .top-bar a {
+      color: #f1f1f1;
+      font-size: 20px;
+      padding-left: 20px;
+      text-decoration: none;
+    }
+
+    .top-bar a:hover {
+      color: #ffaa00;
+    }
+
+    .back-btn {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 30px;
+      color: #f1f1f1;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+
+    .back-btn:hover {
+      color: #ffaa00;
+    }
+
+    .game-container {
+      display: grid;
+      gap: 20px;
+      grid-template-columns: repeat(2, 150px);
+      grid-template-rows: repeat(2, 150px);
+      margin-top: 20px;
+      width: 320px;
+      height: 320px;
+      position: relative;
+      padding: 20px;
+    }
+
+    .color-button {
+      background-color: #555;
+      color: white;
+      font-size: 24px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 10px;
+      user-select: none;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .color-button:hover {
+      transform: scale(1.1);
+    }
+
+    .game-over-screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+    }
+
+    .game-over-screen h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      color: #ffaa00;
+    }
+
+    .game-over-screen p {
+      font-size: 1.5em;
+      margin-bottom: 20px;
+    }
+
+    .game-over-screen button {
+      padding: 10px 20px;
+      font-size: 18px;
+      color: white;
+      background-color: #00aaff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+
+    .game-over-screen button:hover {
+      background-color: #007acc;
+      transform: scale(1.1);
+    }
+
+    .score-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 320px;
+      margin-top: 20px;
+      padding: 10px;
+      background-color: rgba(0, 0, 0, 0.8);
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 10px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6);
+    }
+
+    /* Add specific colors for the Simon game */
+    .color-button.red { background-color: red; }
+    .color-button.green { background-color: green; }
+    .color-button.blue { background-color: blue; }
+    .color-button.yellow { background-color: yellow; }
+  </style>
+</head>
+
+<body>
+  <div class="top-bar">
+    <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+    Simon Says
+  </div>
+  <div id="game" class="game-container">
+    <div class="color-button red" id="red"></div>
+    <div class="color-button green" id="green"></div>
+    <div class="color-button blue" id="blue"></div>
+    <div class="color-button yellow" id="yellow"></div>
+  </div>
+  <div class="score-container">
+    <span>Score: <span id="score">0</span></span>
+  </div>
+
+  <script>
+    const colors = ["red", "green", "blue", "yellow"];
+    let sequence = [];
+    let playerSequence = [];
+    let score = 0;
+
+    const scoreDisplay = document.getElementById("score");
+    const colorButtons = document.querySelectorAll(".color-button");
+
+    colorButtons.forEach(button => {
+      button.addEventListener("click", (event) => {
+        const color = event.target.id;
+        playerSequence.push(color);
+        playColor(color);
+        checkSequence();
+      });
+    });
+
+    function startNewRound() {
+      playerSequence = [];
+      const randomColor = colors[Math.floor(Math.random() * colors.length)];
+      sequence.push(randomColor);
+      displaySequence();
+    }
+
+    function displaySequence() {
+      let i = 0;
+      const interval = setInterval(() => {
+        playColor(sequence[i]);
+        i++;
+        if (i >= sequence.length) {
+          clearInterval(interval);
+        }
+      }, 600);
+    }
+
+    function playColor(color) {
+      const button = document.getElementById(color);
+      button.style.transform = "scale(1.2)";
+      setTimeout(() => {
+        button.style.transform = "scale(1)";
+      }, 300);
+    }
+
+    function checkSequence() {
+      const lastIndex = playerSequence.length - 1;
+      if (playerSequence[lastIndex] !== sequence[lastIndex]) {
+        gameOver();
+      } else if (playerSequence.length === sequence.length) {
+        score++;
+        scoreDisplay.textContent = score;
+        setTimeout(startNewRound, 1000);
+      }
+    }
+
+    function gameOver() {
+      const gameOverScreen = document.createElement("div");
+      gameOverScreen.classList.add("game-over-screen");
+      gameOverScreen.innerHTML = `
+        <h1>Game Over</h1>
+        <p>Score: ${score}</p>
+        <button onclick="restartGame()">Play Again</button>
+      `;
+      document.body.appendChild(gameOverScreen);
+    }
+
+    function restartGame() {
+      score = 0;
+      scoreDisplay.textContent = score;
+      sequence = [];
+      startNewRound();
+      document.querySelector(".game-over-screen").remove();
+    }
+
+    // Start the first round when the page loads
+    window.onload = startNewRound;
+  </script>
+</body>
+
+</html>
